@@ -1,0 +1,59 @@
+---
+title: "GPA Change Calculation"
+author: "Justin Betts"
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
+format:
+  html:
+    theme: materia
+    toc: true
+    toc-depth: 3
+    toc-location: left
+    smooth-scroll: true
+---
+
+```{r, error=FALSE}
+library(dplyr)   #data cleaning
+library(DT)   #table
+```
+
+```{r}
+# load .csv data
+oldest <- read.csv("OldTerm.csv")
+newest <- read.csv("NewTerm.csv")
+```
+
+```{r}
+# combine .csv files by unique student ID
+join <- left_join(oldest, newest, by="Student.ID")
+```
+
+```{r}
+# quick view of the data
+datatable(join, options=list())
+```
+
+```{r}
+# remove NA cells to ensure only students active in both terms included
+data <- na.omit(join)
+```
+
+```{r}
+# add GPA percent change
+data <- mutate(
+  data, CGPA.Change = round((Fall.2023.CGPA / Spring.2023.CGPA - 1) * 100, digits=3))
+```
+
+```{r}
+# filter to active and enrolled students
+data <- filter(data, Enrolled.in.Term.Flag.x == "Y" & Enrolled.in.Term.Flag.y == "Y")
+```
+
+```{r}
+# identify students with 10% or higher change
+data <- filter( data, CGPA.Change >= 10 )
+```
+
+```{r}
+# writes results into .csv to be mail-merged with Dean message
+write.csv(data, file = "GPA Change.csv", row.names = F)
+```

@@ -40,7 +40,7 @@ data <- na.omit(join)
 ```{r}
 # add GPA percent change
 data <- mutate(
-  data, CGPA.Change = round((Fall.2023.CGPA / Spring.2023.CGPA - 1) * 100, digits=3))
+  data, CGPA.Change = round((Newest.CGPA / Oldest.CGPA - 1) * 100, digits=3))
 ```
 
 ```{r}
